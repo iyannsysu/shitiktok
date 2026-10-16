@@ -1,0 +1,1 @@
+{"$schema":"https://openapi.vercel.sh/vercel.json","cleanUrls":true,"functions":{"api/*.js":{"maxDuration":30}},"headers":[{"headers":[{"key":"Cache-Control","value":"no-store"}],"source":"/api/(.*)"}]}

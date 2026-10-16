@@ -1,13 +1,17 @@
 /**
- * shitiktok — web UI mini (http built-in, tanpa framework).
+ * shitiktok — web server (http built-in, tanpa framework).
  *
  *   npm start  →  http://localhost:3000
  *
  * Endpoint:
- *   GET  /            → halaman web UI
- *   POST /api/info    → { url, audio? } → metadata + direct URL (tanpa unduh file)
- *   POST /api/download→ { url, audio? } → unduh ke server, kembalikan info file
- *   GET  /file/:name → unduh file hasil (hanya dari folder downloads/)
+ *   GET  /             → halaman web shitiktok
+ *   GET  /api/health   → { ok, name: 'shitiktok', version }
+ *   POST /api/info     → { url, audio? } → metadata + direct URL (tanpa unduh file)
+ *   POST /api/download → { url, audio? } → unduh ke server, kembalikan info file
+ *   GET  /file/:name   → unduh file hasil (hanya dari folder downloads/)
+ *
+ * Versi web di Vercel (api/*.js) pakai TikWM + scrape saja (tanpa yt-dlp).
+ * Server lokal ini pakai rantai penuh: yt-dlp → TikWM → scrape.
  */
 
 import fs from 'node:fs';
@@ -21,6 +25,7 @@ const ROOT = path.join(__dirname, '..');
 const PUBLIC = path.join(ROOT, 'public');
 const DOWNLOADS = path.join(ROOT, 'downloads');
 const PORT = Number(process.env.PORT || 3000);
+const VERSION = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf-8')).version || '1.0.0';
 
 fs.mkdirSync(DOWNLOADS, { recursive: true });
 
@@ -34,7 +39,7 @@ const MIME = {
 };
 
 function sendJson(res, code, obj) {
-	res.writeHead(code, { 'Content-Type': 'application/json; charset=utf-8' });
+	res.writeHead(code, { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
 	res.end(JSON.stringify(obj));
 }
 
@@ -51,6 +56,17 @@ async function readJsonBody(req) {
 const server = http.createServer(async (req, res) => {
 	try {
 		const url = new URL(req.url, `http://localhost:${PORT}`);
+
+		// CORS preflight
+		if (req.method === 'OPTIONS') {
+			res.writeHead(204, { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET, POST, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type' });
+			return res.end();
+		}
+
+		// Health check — dipakai monitoring / Vercel / uptime check
+		if (req.method === 'GET' && url.pathname === '/api/health') {
+			return sendJson(res, 200, { ok: true, name: 'shitiktok', version: VERSION, time: new Date().toISOString() });
+		}
 
 		// --- Halaman web UI / aset statis ---
 		if (req.method === 'GET' && (url.pathname === '/' || url.pathname === '/index.html')) {
@@ -77,7 +93,7 @@ const server = http.createServer(async (req, res) => {
 		// --- API: unduh ke server ---
 		if (req.method === 'POST' && url.pathname === '/api/download') {
 			const { url: tiktokUrl, audio = false } = await readJsonBody(req);
-			const { file, strategy, meta, size } = await downloadTikTok(tiktokUrl, { audio, outDir: DOWNLOADS });
+			const { file, strategy, meta, size, fileUrl } = await downloadTikTok(tiktokUrl, { audio, outDir: DOWNLOADS });
 			const name = path.basename(file);
 			return sendJson(res, 200, {
 				ok: true,
@@ -85,6 +101,7 @@ const server = http.createServer(async (req, res) => {
 				meta,
 				size,
 				file: name,
+				fileUrl,
 				downloadUrl: `/file/${encodeURIComponent(name)}`,
 			});
 		}
@@ -113,6 +130,6 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(PORT, () => {
-	console.log(`\n🚀 shitiktok web UI jalan di http://localhost:${PORT}`);
+	console.log(`\n🚀 shitiktok web jalan di http://localhost:${PORT}`);
 	console.log('   Buka di browser, tempel URL TikTok, klik Download.\n');
 });

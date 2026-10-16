@@ -291,12 +291,12 @@ async function strategyScrape(url, { audio }) {
  * Ambil info + direct URL tanpa mengunduh file.
  * Mengembalikan { strategy, fileUrl, meta } dari strategi pertama yang berhasil.
  */
-export async function getTikTokInfo(rawUrl, { audio = false } = {}) {
+export async function getTikTokInfo(rawUrl, { audio = false, skipYtDlp = false } = {}) {
 	const validated = validateTikTokUrl(rawUrl);
 	const url = await withRetry(() => resolveShortLink(validated), 'Resolve shortlink');
 
 	const strategies = [
-		() => strategyYtDlp(url, { audio }),
+		...(skipYtDlp ? [] : [() => strategyYtDlp(url, { audio })]),
 		() => strategyTikWm(url, { audio }),
 		() => strategyScrape(url, { audio }),
 	];
@@ -319,8 +319,8 @@ export async function getTikTokInfo(rawUrl, { audio = false } = {}) {
  * Unduh penuh ke `outDir`. Mengembalikan { file, strategy, meta, size }.
  * `onProgress(received, total)` dipanggil selama unduh bila total diketahui.
  */
-export async function downloadTikTok(rawUrl, { audio = false, outDir = 'downloads', onProgress } = {}) {
-	const { strategy, fileUrl, meta } = await getTikTokInfo(rawUrl, { audio });
+export async function downloadTikTok(rawUrl, { audio = false, outDir = 'downloads', onProgress, skipYtDlp = false } = {}) {
+	const { strategy, fileUrl, meta } = await getTikTokInfo(rawUrl, { audio, skipYtDlp });
 
 	fs.mkdirSync(outDir, { recursive: true });
 	const base = sanitizeFilename(`${meta.title || 'tiktok'}_${meta.id}`, `tiktok_${meta.id}`);
@@ -353,5 +353,5 @@ export async function downloadTikTok(rawUrl, { audio = false, outDir = 'download
 		fs.unlinkSync(file);
 		throw new Error(`File terunduh terlalu kecil (${size} byte) — kemungkinan respons error, bukan video`);
 	}
-	return { file, strategy, meta, size };
+	return { file, strategy, meta, size, fileUrl };
 }

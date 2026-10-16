@@ -4,101 +4,195 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>shitiktok — Download TikTok Tanpa Watermark</title>
+<meta name="description" content="shitiktok — download video TikTok tanpa watermark. Anti-gagal: yt-dlp → TikWM → scrape. Gratis, tanpa login.">
+<meta property="og:title" content="shitiktok — Download TikTok Tanpa Watermark">
+<meta property="og:description" content="Tempel link TikTok, klik Download. Tanpa watermark, tanpa login, gratis.">
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: #0b0b10; color: #f1f1f5; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
-  .card { width: 100%; max-width: 620px; background: #16161f; border: 1px solid #2a2a3a; border-radius: 20px; padding: 32px; box-shadow: 0 20px 60px rgba(0,0,0,.5); }
-  h1 { font-size: 2rem; letter-spacing: -1px; }
-  h1 span { background: linear-gradient(90deg,#25f4ee,#fe2c55); -webkit-background-clip: text; background-clip: text; color: transparent; }
-  p.sub { color: #9a9aad; margin: 8px 0 24px; font-size: .95rem; }
-  label { font-size: .85rem; color: #b8b8cc; display: block; margin-bottom: 6px; }
-  input[type=url] { width: 100%; background: #0b0b10; border: 1px solid #2a2a3a; border-radius: 12px; color: #fff; padding: 14px; font-size: 1rem; outline: none; }
-  input[type=url]:focus { border-color: #fe2c55; }
-  .row { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
-  .toggle { display: flex; align-items: center; gap: 8px; font-size: .9rem; color: #c9c9da; cursor: pointer; }
-  button { flex: 1; min-width: 140px; border: none; border-radius: 12px; padding: 14px; font-size: 1rem; font-weight: 700; cursor: pointer; background: linear-gradient(90deg,#25f4ee,#fe2c55); color: #fff; }
-  button:disabled { opacity: .5; cursor: wait; }
-  .result { margin-top: 24px; display: none; background: #0b0b10; border: 1px solid #2a2a3a; border-radius: 14px; padding: 18px; }
-  .result img { width: 100%; border-radius: 10px; margin-bottom: 12px; max-height: 280px; object-fit: cover; }
-  .result h3 { font-size: 1.05rem; margin-bottom: 4px; }
-  .result .meta { color: #9a9aad; font-size: .85rem; margin-bottom: 12px; }
-  .result a.dl { display: inline-block; background: #25f4ee; color: #06251f; font-weight: 700; padding: 10px 18px; border-radius: 10px; text-decoration: none; }
-  .error { margin-top: 16px; display: none; background: #3a1018; border: 1px solid #fe2c55; color: #ffb3c0; padding: 12px 14px; border-radius: 10px; font-size: .9rem; white-space: pre-wrap; }
-  .badge { display: inline-block; font-size: .7rem; background: #262636; border: 1px solid #3a3a4d; padding: 3px 8px; border-radius: 20px; margin-right: 6px; color: #b8b8cc; }
-  footer { margin-top: 20px; text-align: center; color: #6a6a7d; font-size: .8rem; }
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#0b0b10;--card:#16161f;--line:#2a2a3a;--mut:#9a9aad;--cyan:#25f4ee;--pink:#fe2c55}
+  body{background:var(--bg);color:#f1f1f5;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;min-height:100vh}
+  a{color:var(--cyan)}
+  .wrap{max-width:760px;margin:0 auto;padding:24px 16px 48px}
+  header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+  .logo{font-size:1.6rem;font-weight:900;letter-spacing:-1px}
+  .logo span{background:linear-gradient(90deg,var(--cyan),var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .badge-top{font-size:.72rem;background:#262636;border:1px solid #3a3a4d;padding:5px 10px;border-radius:20px;color:#c9c9da;white-space:nowrap}
+  .hero{text-align:center;padding:18px 8px 22px}
+  .hero h1{font-size:2.35rem;line-height:1.05;letter-spacing:-1px}
+  .hero h1 em{font-style:normal;background:linear-gradient(90deg,var(--cyan),var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero p{color:var(--mut);margin:12px auto 0;max-width:560px;font-size:1rem;line-height:1.55}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:22px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+  label{font-size:.85rem;color:#b8b8cc;display:block;margin-bottom:6px}
+  .input-row{display:flex;gap:8px}
+  input[type=url]{flex:1;min-width:0;background:#0b0b10;border:1px solid var(--line);border-radius:12px;color:#fff;padding:14px;font-size:1rem;outline:none}
+  input[type=url]:focus{border-color:var(--pink)}
+  .btn{border:none;border-radius:12px;padding:14px 18px;font-size:1rem;font-weight:800;cursor:pointer;background:linear-gradient(90deg,var(--cyan),var(--pink));color:#fff;white-space:nowrap}
+  .btn:disabled{opacity:.55;cursor:wait}
+  .btn-ghost{background:#262636;color:#fff;border:1px solid #3a3a4d}
+  .row{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;align-items:center}
+  .toggle{display:flex;align-items:center;gap:8px;font-size:.9rem;color:#c9c9da;cursor:pointer}
+  .chip{font-size:.72rem;background:#262636;border:1px solid #3a3a4d;padding:4px 9px;border-radius:20px;color:#b8b8cc}
+  .example{font-size:.85rem;color:var(--mut);margin-top:10px}
+  .example button{background:none;border:none;color:var(--cyan);cursor:pointer;font-size:.85rem;text-decoration:underline;padding:0}
+  .error{margin-top:16px;display:none;background:#3a1018;border:1px solid var(--pink);color:#ffb3c0;padding:12px 14px;border-radius:10px;font-size:.9rem;white-space:pre-wrap}
+  .result{margin-top:18px;display:none;background:#0b0b10;border:1px solid var(--line);border-radius:16px;padding:16px}
+  .result img{width:100%;border-radius:12px;margin-bottom:12px;max-height:320px;object-fit:cover;background:#000}
+  .result h3{font-size:1.08rem;margin-bottom:4px;line-height:1.4}
+  .result .meta{color:var(--mut);font-size:.86rem;margin-bottom:12px;line-height:1.5}
+  .result .actions{display:flex;gap:8px;flex-wrap:wrap}
+  .dl{display:inline-block;background:var(--cyan);color:#06251f;font-weight:800;padding:11px 18px;border-radius:10px;text-decoration:none}
+  .dl-pink{background:var(--pink);color:#fff}
+  .history{margin-top:18px}
+  .history h2{font-size:1rem;margin-bottom:8px}
+  .history ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+  .history li{background:#0b0b10;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:.88rem;display:flex;justify-content:space-between;gap:10px;align-items:center}
+  .history li span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .history li button{background:none;border:1px solid #3a3a4d;color:#fff;border-radius:8px;padding:6px 10px;cursor:pointer;font-size:.8rem}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}
+  @media(max-width:600px){.grid{grid-template-columns:1fr}.hero h1{font-size:1.85rem}.input-row{flex-direction:column}.btn{width:100%}}
+  .feat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+  .feat b{display:block;margin-bottom:6px}
+  .feat p{color:var(--mut);font-size:.9rem;line-height:1.55}
+  .how{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
+  .how h2{font-size:1.05rem;margin-bottom:10px}
+  .how ol{padding-left:18px;color:var(--mut);font-size:.92rem;line-height:1.7}
+  .how ol b{color:#fff}
+  footer{margin-top:26px;text-align:center;color:#6a6a7d;font-size:.8rem;line-height:1.6}
+  .pill{display:inline-block;font-size:.72rem;background:#262636;border:1px solid #3a3a4d;padding:3px 8px;border-radius:20px;color:#b8b8cc;margin:2px}
 </style>
 </head>
 <body>
-<div class="card">
-  <h1>shit<span>iktok</span></h1>
-  <p class="sub">Download video TikTok tanpa watermark. Anti-gagal: yt-dlp → TikWM → scrape, otomatis fallback.</p>
+<div class="wrap">
+  <header>
+    <div class="logo">shit<span>iktok</span></div>
+    <div class="badge-top">✦ Web • Gratis • Tanpa Login</div>
+  </header>
 
-  <label for="url">URL Video TikTok</label>
-  <input id="url" type="url" placeholder="https://www.tiktok.com/@user/video/..." autocomplete="off">
-
-  <div class="row">
-    <label class="toggle"><input type="checkbox" id="audio"> Audio MP3 saja</label>
-    <span class="badge">Tanpa watermark</span>
-    <span class="badge">Tanpa login</span>
-    <span class="badge">Gratis</span>
+  <div class="hero">
+    <h1>Download TikTok<br><em>tanpa watermark.</em></h1>
+    <p>Tempel link TikTok, klik Download. Kalau satu cara gagal, otomatis coba cara berikutnya — sampai berhasil.</p>
+    <div style="margin-top:10px"><span class="pill">🎬 No Watermark</span><span class="pill">🎵 MP3</span><span class="pill">🛡️ Anti-Gagal</span><span class="pill">🔒 Tanpa Login</span></div>
   </div>
 
-  <div class="row">
-    <button id="btn">⬇ Download</button>
+  <div class="card">
+    <label for="url">URL Video TikTok</label>
+    <div class="input-row">
+      <input id="url" type="url" placeholder="https://www.tiktok.com/@user/video/..." autocomplete="off" inputmode="url">
+      <button class="btn" id="btn">⬇ Download</button>
+    </div>
+    <div class="row">
+      <label class="toggle"><input type="checkbox" id="audio"> Audio MP3 saja</label>
+      <button class="btn btn-ghost" id="paste" type="button" style="padding:9px 12px;font-size:.88rem">📋 Paste</button>
+      <button class="btn btn-ghost" id="clear" type="button" style="padding:9px 12px;font-size:.88rem">✕ Bersihkan</button>
+    </div>
+    <div class="example">Contoh: <button id="exampleBtn" type="button">JEJAK KALA EP6 — Topeng Wayang</button></div>
+    <div class="error" id="error"></div>
+    <div class="result" id="result">
+      <img id="cover" alt="cover">
+      <h3 id="title"></h3>
+      <div class="meta" id="meta"></div>
+      <div class="actions">
+        <a class="dl" id="dl" href="#" download>⬇ Simpan File</a>
+        <a class="dl dl-pink" id="openDirect" href="#" target="_blank" rel="noopener" style="display:none">🔗 Buka Link Langsung</a>
+        <button class="btn btn-ghost" id="copyLink" type="button" style="padding:11px 14px">🔗 Salin Link Video</button>
+      </div>
+    </div>
+    <div class="history" id="historyBox" style="display:none">
+      <h2>🕘 Terakhir diunduh di perangkat ini</h2>
+      <ul id="history"></ul>
+    </div>
   </div>
 
-  <div class="error" id="error"></div>
-
-  <div class="result" id="result">
-    <img id="cover" alt="cover">
-    <h3 id="title"></h3>
-    <div class="meta" id="meta"></div>
-    <a class="dl" id="dl" href="#" download>⬇ Simpan File</a>
+  <div class="grid">
+    <div class="feat"><b>🛡️ Anti-Gagal</b><p>Rantai fallback: yt-dlp → TikWM API → scrape CDN. Satu gagal, langsung coba berikutnya. Di versi web, yang jalan TikWM + scrape (tanpa yt-dlp).</p></div>
+    <div class="feat"><b>🎬 Tanpa Watermark</b><p>Video yang diunduh bersih, kualitas terbaik yang tersedia. Cocok untuk arsip video sendiri.</p></div>
+    <div class="feat"><b>🎵 Video & MP3</b><p>Butuh lagunya aja? Centang “Audio MP3 saja” — langsung dapat MP3-nya.</p></div>
+    <div class="feat"><b>🔒 Tanpa Login</b><p>Nggak perlu login TikTok, nggak perlu cookie. Hanya video publik yang bisa diunduh.</p></div>
   </div>
 
-  <footer>Hanya untuk video publik. Video privat / dihapus / region-locked tidak bisa diunduh.</footer>
+  <div class="how">
+    <h2>Cara pakai</h2>
+    <ol>
+      <li><b>Salin link</b> video TikTok dari aplikasi (Share → Copy Link).</li>
+      <li><b>Tempel</b> di kotak di atas, pilih Video / MP3.</li>
+      <li><b>Klik Download</b> → tunggu info muncul → klik <b>Simpan File</b>.</li>
+    </ol>
+  </div>
+
+  <footer>
+    <b style="color:#c9c9da">shitiktok</b> — tools download TikTok tanpa watermark.<br>
+    Hanya untuk video publik. Video privat / dihapus / region-locked tidak bisa diunduh.<br>
+    Gunakan untuk video milik sendiri atau yang diizinkan pemiliknya. Hormati hak cipta kreator. • MIT
+  </footer>
 </div>
 
 <script>
 const $ = (id) => document.getElementById(id);
-$('btn').addEventListener('click', async () => {
+const EXAMPLE_URL = 'https://www.tiktok.com/@shiyan841/video/7697298046408740148';
+const HISTORY_KEY = 'shitiktok-history-v1';
+
+function loadHistory(){
+  try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch { return []; }
+}
+function saveHistory(item){
+  const list = loadHistory().filter(x => x.url !== item.url);
+  list.unshift(item);
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(list.slice(0,10)));
+  renderHistory();
+}
+function renderHistory(){
+  const list = loadHistory();
+  $('historyBox').style.display = list.length ? 'block' : 'none';
+  $('history').innerHTML = list.map((x,i)=>`<li><span title="${x.title||x.url}">🎬 ${x.title||x.url}</span><button data-i="${i}">Pakai lagi</button></li>`).join('');
+  document.querySelectorAll('#history button').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      const it = loadHistory()[Number(b.dataset.i)];
+      if(it){ $('url').value = it.url; $('audio').checked = !!it.audio; window.scrollTo({top:0,behavior:'smooth'}); }
+    });
+  });
+}
+renderHistory();
+
+$('exampleBtn').addEventListener('click', ()=>{ $('url').value = EXAMPLE_URL; });
+$('paste').addEventListener('click', async ()=>{
+  try { const t = await navigator.clipboard.readText(); if(t) $('url').value = t.trim(); }
+  catch { showError('Browser memblokir paste otomatis — tempel manual ya (Ctrl+V).'); }
+});
+$('clear').addEventListener('click', ()=>{ $('url').value=''; $('error').style.display='none'; $('result').style.display='none'; $('url').focus(); });
+$('copyLink').addEventListener('click', async ()=>{
+  const href = $('dl').href;
+  try { await navigator.clipboard.writeText(href); $('copyLink').textContent='✅ Tersalin!'; setTimeout(()=>$('copyLink').textContent='🔗 Salin Link Video',1500); }
+  catch { showError('Gagal menyalin — salin manual dari tombol Simpan File.'); }
+});
+
+$('btn').addEventListener('click', async ()=>{
   const url = $('url').value.trim();
   const audio = $('audio').checked;
-  $('error').style.display = 'none';
-  $('result').style.display = 'none';
-  if (!url) { showError('Tempel dulu URL video TikTok-nya.'); return; }
-  $('btn').disabled = true;
-  $('btn').textContent = '⏳ Mengunduh...';
-  try {
-    const res = await fetch('/api/download', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url, audio }),
-    });
-    const data = await res.json();
-    if (!data.ok) throw new Error(data.error || 'Gagal mengunduh');
+  $('error').style.display='none';
+  $('result').style.display='none';
+  if(!url){ showError('Tempel dulu URL video TikTok-nya.'); return; }
+  $('btn').disabled=true; $('btn').textContent='⏳ Mengunduh...';
+  try{
+    const res = await fetch('/api/download', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({url, audio}) });
+    const data = await res.json().catch(()=>({}));
+    if(!res.ok || !data.ok) throw new Error(data.error || `Gagal mengunduh (HTTP ${res.status})`);
     const m = data.meta || {};
-    if (m.cover) $('cover').src = m.cover; else $('cover').style.display = 'none';
+    if(m.cover){ $('cover').src=m.cover; $('cover').style.display='block'; } else $('cover').style.display='none';
     $('title').textContent = m.title || 'Video TikTok';
-    $('meta').textContent =
-      `👤 ${m.author || '-'}${m.authorUniqueId ? ' (@' + m.authorUniqueId + ')' : ''}  •  ` +
-      `⏱ ${m.duration ?? '-'} dtk  •  ❤️ ${(m.likes ?? '-').toLocaleString?.() ?? m.likes ?? '-'}  •  ` +
-      `Strategi: ${data.strategy}  •  Ukuran: ${(data.size / 1048576).toFixed(1)} MB`;
-    $('dl').href = data.downloadUrl;
-    $('dl').textContent = `⬇ Simpan ${audio ? 'MP3' : 'MP4'}`;
-    $('result').style.display = 'block';
-  } catch (e) {
-    showError(e.message);
-  } finally {
-    $('btn').disabled = false;
-    $('btn').textContent = '⬇ Download';
-  }
+    $('meta').textContent = `👤 ${m.author||'-'}${m.authorUniqueId?' (@'+m.authorUniqueId+')':''}  •  ⏱ ${m.duration??'-'} dtk  •  ❤️ ${(m.likes??'-').toLocaleString?.() ?? m.likes ?? '-'}  •  👁 ${(m.views??'-').toLocaleString?.() ?? m.views ?? '-'}  •  Strategi: ${data.strategy}  •  Ukuran: ${data.size ? (data.size/1048576).toFixed(1)+' MB' : '-'}`;
+    // Server lokal: downloadUrl = /file/xxx ; Vercel: fileUrl = CDN langsung
+    const dlHref = data.downloadUrl || data.fileUrl || '#';
+    $('dl').href = dlHref;
+    $('dl').textContent = `⬇ Simpan ${audio?'MP3':'MP4'}`;
+    if(data.fileUrl && data.fileUrl !== dlHref){ $('openDirect').href=data.fileUrl; $('openDirect').style.display='inline-block'; }
+    else if(data.fileUrl){ $('openDirect').href=data.fileUrl; $('openDirect').style.display='inline-block'; }
+    else $('openDirect').style.display='none';
+    $('result').style.display='block';
+    saveHistory({url, audio, title: m.title || url, at: Date.now()});
+  }catch(e){ showError(e.message); }
+  finally{ $('btn').disabled=false; $('btn').textContent='⬇ Download'; }
 });
-function showError(msg) {
-  const el = $('error');
-  el.textContent = '❌ ' + msg;
-  el.style.display = 'block';
-}
+function showError(msg){ const el=$('error'); el.textContent='❌ '+msg; el.style.display='block'; }
 </script>
 </body>
 </html>

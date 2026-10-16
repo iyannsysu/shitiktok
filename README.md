@@ -1,35 +1,38 @@
 # shitiktok — Download TikTok Tanpa Watermark
 
-Tools download video TikTok tanpa watermark, dengan rantai fallback **anti-gagal**:
-kalau satu cara gagal, otomatis coba cara berikutnya sampai ada yang berhasil.
+**shitiktok** adalah web + tools download video TikTok tanpa watermark, dengan rantai fallback **anti-gagal**: kalau satu cara gagal, otomatis coba cara berikutnya sampai ada yang berhasil.
 
-## Fitur
+## 🌐 Web — cara paling gampang
 
-- 🎬 Video tanpa watermark (kualitas terbaik yang tersedia)
-- 🎵 Mode audio — unduh MP3 musiknya saja (`--audio`)
-- 📝 Metadata JSON: judul, author, durasi, cover, likes, comments, shares, views (`--meta`)
-- 🖥️ Web UI dark premium — tempel URL, klik Download
-- 💻 CLI dengan progress log Bahasa Indonesia
-- 🔒 Tanpa login, tanpa cookie/session pengguna, tanpa dependency npm
+Buka web shitiktok, tempel link TikTok, klik **Download**.
 
-## Syarat
-
-- **Node.js 18+** (wajib — pakai `fetch` bawaan Node)
-- **yt-dlp (opsional, sangat disarankan)** — strategi paling andal:
-  ```bash
-  pip install yt-dlp
-  # atau: sudo apt install yt-dlp
-  ```
-
-## Install
+### Deploy web sendiri (gratis, Vercel)
 
 ```bash
 git clone https://github.com/iyannsysu/shitiktok.git
 cd shitiktok
-# tidak ada npm install — nol dependency
+# Import repo ini ke Vercel (vercel.com/new) — tanpa setting tambahan.
+# File statis dari public/, API dari api/ (TikWM + scrape, tanpa yt-dlp).
 ```
 
-## Cara Pakai
+### Jalankan web di komputer sendiri
+
+```bash
+npm start
+# buka http://localhost:3000
+```
+
+Web lokal pakai rantai penuh: **yt-dlp → TikWM → scrape**, file tersimpan di `downloads/`.
+Web Vercel pakai **TikWM → scrape** (tanpa yt-dlp, karena binary tidak ada di serverless) — tetap anti-gagal, link CDN langsung dikembalikan ke browser.
+
+Fitur web:
+- 🎬 Video tanpa watermark + 🎵 mode Audio MP3
+- 📝 Info video: judul, author, durasi, likes, views, strategi yang berhasil
+- 🕘 Riwayat unduhan tersimpan di perangkat (localStorage)
+- 📋 Tombol Paste, contoh link, salin link video
+- 📱 Responsif — enak dibuka dari HP
+
+## 💻 Tools — CLI & Library
 
 ### CLI
 
@@ -50,17 +53,7 @@ Atau via npm script:
 npm run dl -- <url> --audio --meta
 ```
 
-### Web UI
-
-```bash
-npm start
-# buka http://localhost:3000
-```
-
-Tempel URL TikTok → klik **Download** → info video muncul → klik **Simpan File**.
-Port bisa diubah: `PORT=8080 npm start`.
-
-### Pakai sebagai library
+### Library
 
 ```js
 import { downloadTikTok, getTikTokInfo } from './src/tiktok.js';
@@ -75,13 +68,32 @@ const { file, strategy, meta, size } = await downloadTikTok(url, {
 });
 ```
 
+### API (web)
+
+```bash
+GET  /api/health              # cek server hidup
+POST /api/info    { url }     # metadata + direct URL
+POST /api/download { url, audio? }  # lokal: file di server; Vercel: fileUrl CDN
+GET  /file/:name              # (lokal saja) unduh file hasil
+```
+
+## Syarat
+
+- **Node.js 18+** (wajib — pakai `fetch` bawaan Node)
+- **yt-dlp (opsional, sangat disarankan untuk CLI / server lokal)** — strategi paling andal:
+  ```bash
+  pip install yt-dlp
+  # atau: sudo apt install yt-dlp
+  ```
+- Tidak ada `npm install` — **nol dependency**.
+
 ## Cara Kerja — Strategi Anti-Gagal
 
 Diuji berurutan, hasil pertama yang berhasil dipakai:
 
 | # | Strategi | Keterangan |
 |---|----------|------------|
-| 1 | **yt-dlp** | Paling andal, tanpa watermark, kualitas terbaik. Butuh binary `yt-dlp` terinstall. |
+| 1 | **yt-dlp** | Paling andal, tanpa watermark, kualitas terbaik. Butuh binary `yt-dlp` terinstall. (CLI + server lokal saja) |
 | 2 | **TikWM API** | API publik gratis tanpa key. Ambil `play` (no watermark) / `wmplay` / `music`. |
 | 3 | **oEmbed + scrape** | Fetch halaman TikTok dengan User-Agent mobile, ekstrak link CDN `playAddr` dari HTML. |
 
