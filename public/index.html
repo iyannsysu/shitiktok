@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>shitiktok — Download TikTok Tanpa Watermark</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0b0b10; color: #f1f1f5; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+  .card { width: 100%; max-width: 620px; background: #16161f; border: 1px solid #2a2a3a; border-radius: 20px; padding: 32px; box-shadow: 0 20px 60px rgba(0,0,0,.5); }
+  h1 { font-size: 2rem; letter-spacing: -1px; }
+  h1 span { background: linear-gradient(90deg,#25f4ee,#fe2c55); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  p.sub { color: #9a9aad; margin: 8px 0 24px; font-size: .95rem; }
+  label { font-size: .85rem; color: #b8b8cc; display: block; margin-bottom: 6px; }
+  input[type=url] { width: 100%; background: #0b0b10; border: 1px solid #2a2a3a; border-radius: 12px; color: #fff; padding: 14px; font-size: 1rem; outline: none; }
+  input[type=url]:focus { border-color: #fe2c55; }
+  .row { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+  .toggle { display: flex; align-items: center; gap: 8px; font-size: .9rem; color: #c9c9da; cursor: pointer; }
+  button { flex: 1; min-width: 140px; border: none; border-radius: 12px; padding: 14px; font-size: 1rem; font-weight: 700; cursor: pointer; background: linear-gradient(90deg,#25f4ee,#fe2c55); color: #fff; }
+  button:disabled { opacity: .5; cursor: wait; }
+  .result { margin-top: 24px; display: none; background: #0b0b10; border: 1px solid #2a2a3a; border-radius: 14px; padding: 18px; }
+  .result img { width: 100%; border-radius: 10px; margin-bottom: 12px; max-height: 280px; object-fit: cover; }
+  .result h3 { font-size: 1.05rem; margin-bottom: 4px; }
+  .result .meta { color: #9a9aad; font-size: .85rem; margin-bottom: 12px; }
+  .result a.dl { display: inline-block; background: #25f4ee; color: #06251f; font-weight: 700; padding: 10px 18px; border-radius: 10px; text-decoration: none; }
+  .error { margin-top: 16px; display: none; background: #3a1018; border: 1px solid #fe2c55; color: #ffb3c0; padding: 12px 14px; border-radius: 10px; font-size: .9rem; white-space: pre-wrap; }
+  .badge { display: inline-block; font-size: .7rem; background: #262636; border: 1px solid #3a3a4d; padding: 3px 8px; border-radius: 20px; margin-right: 6px; color: #b8b8cc; }
+  footer { margin-top: 20px; text-align: center; color: #6a6a7d; font-size: .8rem; }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>shit<span>iktok</span></h1>
+  <p class="sub">Download video TikTok tanpa watermark. Anti-gagal: yt-dlp → TikWM → scrape, otomatis fallback.</p>
+
+  <label for="url">URL Video TikTok</label>
+  <input id="url" type="url" placeholder="https://www.tiktok.com/@user/video/..." autocomplete="off">
+
+  <div class="row">
+    <label class="toggle"><input type="checkbox" id="audio"> Audio MP3 saja</label>
+    <span class="badge">Tanpa watermark</span>
+    <span class="badge">Tanpa login</span>
+    <span class="badge">Gratis</span>
+  </div>
+
+  <div class="row">
+    <button id="btn">⬇ Download</button>
+  </div>
+
+  <div class="error" id="error"></div>
+
+  <div class="result" id="result">
+    <img id="cover" alt="cover">
+    <h3 id="title"></h3>
+    <div class="meta" id="meta"></div>
+    <a class="dl" id="dl" href="#" download>⬇ Simpan File</a>
+  </div>
+
+  <footer>Hanya untuk video publik. Video privat / dihapus / region-locked tidak bisa diunduh.</footer>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+$('btn').addEventListener('click', async () => {
+  const url = $('url').value.trim();
+  const audio = $('audio').checked;
+  $('error').style.display = 'none';
+  $('result').style.display = 'none';
+  if (!url) { showError('Tempel dulu URL video TikTok-nya.'); return; }
+  $('btn').disabled = true;
+  $('btn').textContent = '⏳ Mengunduh...';
+  try {
+    const res = await fetch('/api/download', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url, audio }),
+    });
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error || 'Gagal mengunduh');
+    const m = data.meta || {};
+    if (m.cover) $('cover').src = m.cover; else $('cover').style.display = 'none';
+    $('title').textContent = m.title || 'Video TikTok';
+    $('meta').textContent =
+      `👤 ${m.author || '-'}${m.authorUniqueId ? ' (@' + m.authorUniqueId + ')' : ''}  •  ` +
+      `⏱ ${m.duration ?? '-'} dtk  •  ❤️ ${(m.likes ?? '-').toLocaleString?.() ?? m.likes ?? '-'}  •  ` +
+      `Strategi: ${data.strategy}  •  Ukuran: ${(data.size / 1048576).toFixed(1)} MB`;
+    $('dl').href = data.downloadUrl;
+    $('dl').textContent = `⬇ Simpan ${audio ? 'MP3' : 'MP4'}`;
+    $('result').style.display = 'block';
+  } catch (e) {
+    showError(e.message);
+  } finally {
+    $('btn').disabled = false;
+    $('btn').textContent = '⬇ Download';
+  }
+});
+function showError(msg) {
+  const el = $('error');
+  el.textContent = '❌ ' + msg;
+  el.style.display = 'block';
+}
+</script>
+</body>
+</html>
